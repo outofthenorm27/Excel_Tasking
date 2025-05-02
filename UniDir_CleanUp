@@ -1,0 +1,33 @@
+Step 1: Create a New Column
+In Column D, title the header: Priority Rank
+
+Step 2: Enter the Formula in Cell D2
+
+=IF(ISNUMBER(SEARCH("@bac.com", C2)), 1,
+ IF(ISNUMBER(SEARCH("@baml.com", C2)), 2,
+ IF(ISNUMBER(SEARCH("@bofa.com", C2)), 3,
+ IF(ISNUMBER(SEARCH("@bankofamerica.com", C2)), 4,
+ IF(ISNUMBER(SEARCH("@ml.com", C2)), 5, 99)))))
+
+Step 3: Drag the Formula Down
+Select cell D2
+
+Hover over the bottom-right corner of the cell (you’ll see a small square “handle”)
+
+Click and drag down to fill the formula for all rows
+
+Step 4: Sort by Priority (Optional)
+Select the full table (including headers)
+
+Go to the Data tab → Click Sort
+
+Sort by Priority Rank (smallest to largest)
+
+Explanation of the Formula
+- SEARCH("@bac.com", C2) checks if the email contains that domain.
+
+- ISNUMBER(...) ensures the domain was actually found.
+
+- IF(..., rank, next condition) chains through your priority list.
+
+- If no match is found, it defaults to 99.
