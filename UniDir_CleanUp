@@ -31,3 +31,22 @@ Explanation of the Formula
 - IF(..., rank, next condition) chains through your priority list.
 
 - If no match is found, it defaults to 99.
+
+
+
+
+
+To add an indicator in Column C when the SMTP address (Column B) does not contain any name components from the NAME column (Column A), you can use the following formula in cell C2 and copy it down:
+
+=IF(AND(ISERROR(SEARCH(LEFT(A2,FIND(",",A2)-1),B2)), ISERROR(SEARCH(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2))),B2))), "Name Mismatch", "")
+
+
+Explanation:
+
+  LEFT(A2,FIND(",",A2)-1) extracts the last name.
+  
+  TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2))) extracts the first name.
+  
+  SEARCH(...,B2) checks if each name component is found in the SMTP address.
+  
+  If neither name is found (AND(ISERROR(...))), it marks as "Name Mismatch".
