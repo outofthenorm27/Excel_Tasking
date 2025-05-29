@@ -73,24 +73,20 @@ To apply the updated logic (only accept emails in the formats first.last or firs
 
 
 
-
 =LET(
   fullName, B2,
   email, LOWER(C2),
-  spacePos, FIND(" ", fullName & " "),
-  first, LOWER(LEFT(fullName, spacePos - 1)),
-  last, LOWER(TRIM(RIGHT(fullName, LEN(fullName) - spacePos))),
-  firstInitial, LEFT(first,1),
+  nameParts, TEXTSPLIT(LOWER(fullName), " "),
+  first, INDEX(nameParts, 1),
+  last, IF(COUNTA(nameParts) > 1, INDEX(nameParts, COUNTA(nameParts)), ""),
+  firstInit, LEFT(first,1),
   fmt1, first & "." & last,
   fmt2, first & "_" & last,
-  fmt3, first & "." & first & "." & last,       -- for names like paul.a.aarons
-  fmt4, firstInitial & "." & last,
-  fmt5, first & "." & firstInitial & "." & last,
-  fmt6, last & "." & first,
-  isValidFormat, AND(
-    ISNUMBER(SEARCH("@", email)),
-    ISNUMBER(SEARCH(".", email))
-  ),
+  fmt3, first & "." & firstInit & "." & last,
+  fmt4, firstInit & "." & last,
+  fmt5, last & "." & first,
+  fmt6, first & "." & last,
+  basicValid, AND(ISNUMBER(SEARCH("@", email)), ISNUMBER(SEARCH(".", email))),
   nameMatch, OR(
     ISNUMBER(SEARCH(fmt1, email)),
     ISNUMBER(SEARCH(fmt2, email)),
@@ -98,7 +94,7 @@ To apply the updated logic (only accept emails in the formats first.last or firs
     ISNUMBER(SEARCH(fmt4, email)),
     ISNUMBER(SEARCH(fmt5, email)),
     ISNUMBER(SEARCH(fmt6, email)),
-    ISNUMBER(SEARCH(first, email)) * ISNUMBER(SEARCH(last, email))
+    AND(ISNUMBER(SEARCH(first, email)), ISNUMBER(SEARCH(last, email)))
   ),
-  IF(AND(isValidFormat, nameMatch), "", "Mismatch")
+  IF(AND(basicValid, nameMatch), "", "Mismatch")
 )
