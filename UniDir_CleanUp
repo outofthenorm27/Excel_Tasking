@@ -69,3 +69,40 @@ To apply the updated logic (only accept emails in the formats first.last or firs
     IF(validEmail, "", "Name Mismatch")
 )
 
+
+
+
+
+
+To include more name format variations in your validation logic — now allowing:
+
+ first.last
+ 
+ first_last
+ 
+ last.first
+ 
+ last_first
+ 
+ firstInitial + last
+
+
+
+=LET(
+    fullName, A2,
+    first, LOWER(TRIM(RIGHT(fullName, LEN(fullName)-FIND(",", fullName)))),
+    last, LOWER(LEFT(fullName, FIND(",", fullName)-1)),
+    email, LOWER(B2),
+    fmt1, first & "." & last,
+    fmt2, first & "_" & last,
+    fmt3, last & "." & first,
+    fmt4, last & "_" & first,
+    fmt5, LEFT(first,1) & last,
+    IF(OR(
+        ISNUMBER(SEARCH(fmt1, email)),
+        ISNUMBER(SEARCH(fmt2, email)),
+        ISNUMBER(SEARCH(fmt3, email)),
+        ISNUMBER(SEARCH(fmt4, email)),
+        ISNUMBER(SEARCH(fmt5, email))
+    ), "", "Name Mismatch")
+)
