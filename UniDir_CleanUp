@@ -56,12 +56,14 @@ Explanation:
 
 
 =IF(OR(
-    ISNUMBER(SEARCH("/o=ml",C2)),
+    ISNUMBER(SEARCH("/o=ml", C2)),
+    ISNUMBER(SEARCH("x400", C2)),
     AND(
-        ISERROR(SEARCH(LEFT(B2,FIND(",",B2)-1),C2)),
-        ISERROR(SEARCH(TRIM(RIGHT(B2,LEN(B2)-FIND(",",B2))),C2))
+        ISERROR(SEARCH(LEFT(B2, FIND(",", B2) - 1), C2)),
+        ISERROR(SEARCH(TRIM(RIGHT(B2, LEN(B2) - FIND(",", B2))), C2))
     )
 ), "Name Mismatch", "")
+
 
 
 
