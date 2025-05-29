@@ -50,3 +50,22 @@ Explanation:
   SEARCH(...,B2) checks if each name component is found in the SMTP address.
   
   If neither name is found (AND(ISERROR(...))), it marks as "Name Mismatch".
+
+
+
+
+
+To apply the updated logic (only accept emails in the formats first.last or firstInitial+last), and exclude partial matches like "cn=rnorman" or "x400, norman", here's the improved Excel formula you can use in Column C, starting from C2:
+
+
+=LET(
+    fullName, A2,
+    first, LOWER(TRIM(RIGHT(fullName,LEN(fullName)-FIND(",",fullName)))),
+    last, LOWER(LEFT(fullName,FIND(",",fullName)-1)),
+    email, LOWER(B2),
+    dotFormat, first & "." & last,
+    shortFormat, LEFT(first,1) & last,
+    validEmail, OR(ISNUMBER(SEARCH(dotFormat,email)), ISNUMBER(SEARCH(shortFormat,email))),
+    IF(validEmail, "", "Name Mismatch")
+)
+
