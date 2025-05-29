@@ -74,38 +74,31 @@ To apply the updated logic (only accept emails in the formats first.last or firs
 
 
 
-To include more name format variations in your validation logic — now allowing:
-
- first.last
- 
- first_last
- 
- last.first
- 
- last_first
- 
- firstInitial + last
-
-
-
-=IF(OR(
-  ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))) & "." & LOWER(LEFT(A2,FIND(",",A2)-1)), LOWER(B2))),
-  ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))) & "_" & LOWER(LEFT(A2,FIND(",",A2)-1)), LOWER(B2))),
-  ISNUMBER(SEARCH(LOWER(LEFT(A2,FIND(",",A2)-1)) & "." & LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))), LOWER(B2))),
-  ISNUMBER(SEARCH(LOWER(LEFT(A2,FIND(",",A2)-1)) & "_" & LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))), LOWER(B2))),
-  ISNUMBER(SEARCH(LOWER(LEFT(SUBSTITUTE(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))," ",""),1) & LOWER(LEFT(A2,FIND(",",A2)-1))), LOWER(B2)))
-), "", "Name Mismatch")
-
-
-
-
-To detect mismatches where the email in Column C is either not in standard email format or does not match the name in Column B, you can use a formula like this in cell D2 and drag it down:
-
-=IF(OR(
-     ISERROR(SEARCH("@", C2)), 
-     NOT(ISNUMBER(FIND(".", C2))), 
-     NOT(AND(
-         ISNUMBER(SEARCH(LOWER(LEFT(B2, FIND(" ", B2 & " ") - 1)), LOWER(C2))),
-         ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(B2, LEN(B2) - FIND(" ", B2 & " ")))), LOWER(C2)))
-     ))
-), "Mismatch", "")
+=LET(
+  fullName, B2,
+  email, LOWER(C2),
+  spacePos, FIND(" ", fullName & " "),
+  first, LOWER(LEFT(fullName, spacePos - 1)),
+  last, LOWER(TRIM(RIGHT(fullName, LEN(fullName) - spacePos))),
+  firstInitial, LEFT(first,1),
+  fmt1, first & "." & last,
+  fmt2, first & "_" & last,
+  fmt3, first & "." & first & "." & last,       -- for names like paul.a.aarons
+  fmt4, firstInitial & "." & last,
+  fmt5, first & "." & firstInitial & "." & last,
+  fmt6, last & "." & first,
+  isValidFormat, AND(
+    ISNUMBER(SEARCH("@", email)),
+    ISNUMBER(SEARCH(".", email))
+  ),
+  nameMatch, OR(
+    ISNUMBER(SEARCH(fmt1, email)),
+    ISNUMBER(SEARCH(fmt2, email)),
+    ISNUMBER(SEARCH(fmt3, email)),
+    ISNUMBER(SEARCH(fmt4, email)),
+    ISNUMBER(SEARCH(fmt5, email)),
+    ISNUMBER(SEARCH(fmt6, email)),
+    ISNUMBER(SEARCH(first, email)) * ISNUMBER(SEARCH(last, email))
+  ),
+  IF(AND(isValidFormat, nameMatch), "", "Mismatch")
+)
