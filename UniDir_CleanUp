@@ -96,3 +96,16 @@ To include more name format variations in your validation logic — now allowing
   ISNUMBER(SEARCH(LOWER(LEFT(SUBSTITUTE(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))," ",""),1) & LOWER(LEFT(A2,FIND(",",A2)-1))), LOWER(B2)))
 ), "", "Name Mismatch")
 
+
+
+
+To detect mismatches where the email in Column C is either not in standard email format or does not match the name in Column B, you can use a formula like this in cell D2 and drag it down:
+
+=IF(OR(
+     ISERROR(SEARCH("@", C2)), 
+     NOT(ISNUMBER(FIND(".", C2))), 
+     NOT(AND(
+         ISNUMBER(SEARCH(LOWER(LEFT(B2, FIND(" ", B2 & " ") - 1)), LOWER(C2))),
+         ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(B2, LEN(B2) - FIND(" ", B2 & " ")))), LOWER(C2)))
+     ))
+), "Mismatch", "")
