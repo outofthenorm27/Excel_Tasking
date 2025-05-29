@@ -55,46 +55,16 @@ Explanation:
 
 
 
-To apply the updated logic (only accept emails in the formats first.last or firstInitial+last), and exclude partial matches like "cn=rnorman" or "x400, norman", here's the improved Excel formula you can use in Column C, starting from C2:
-
-
-=LET(
-    fullName, A2,
-    first, LOWER(TRIM(RIGHT(fullName,LEN(fullName)-FIND(",",fullName)))),
-    last, LOWER(LEFT(fullName,FIND(",",fullName)-1)),
-    email, LOWER(B2),
-    dotFormat, first & "." & last,
-    shortFormat, LEFT(first,1) & last,
-    validEmail, OR(ISNUMBER(SEARCH(dotFormat,email)), ISNUMBER(SEARCH(shortFormat,email))),
-    IF(validEmail, "", "Name Mismatch")
-)
+=IF(OR(
+    ISNUMBER(SEARCH("/o=ml",C2)),
+    AND(
+        ISERROR(SEARCH(LEFT(B2,FIND(",",B2)-1),C2)),
+        ISERROR(SEARCH(TRIM(RIGHT(B2,LEN(B2)-FIND(",",B2))),C2))
+    )
+), "Name Mismatch", "")
 
 
 
 
 
-=LET(
-  fullName, B2,
-  email, LOWER(C2),
-  nameParts, TEXTSPLIT(LOWER(fullName), " "),
-  first, INDEX(nameParts, 1),
-  last, IF(COUNTA(nameParts) > 1, INDEX(nameParts, COUNTA(nameParts)), ""),
-  firstInit, LEFT(first,1),
-  fmt1, first & "." & last,
-  fmt2, first & "_" & last,
-  fmt3, first & "." & firstInit & "." & last,
-  fmt4, firstInit & "." & last,
-  fmt5, last & "." & first,
-  fmt6, first & "." & last,
-  basicValid, AND(ISNUMBER(SEARCH("@", email)), ISNUMBER(SEARCH(".", email))),
-  nameMatch, OR(
-    ISNUMBER(SEARCH(fmt1, email)),
-    ISNUMBER(SEARCH(fmt2, email)),
-    ISNUMBER(SEARCH(fmt3, email)),
-    ISNUMBER(SEARCH(fmt4, email)),
-    ISNUMBER(SEARCH(fmt5, email)),
-    ISNUMBER(SEARCH(fmt6, email)),
-    AND(ISNUMBER(SEARCH(first, email)), ISNUMBER(SEARCH(last, email)))
-  ),
-  IF(AND(basicValid, nameMatch), "", "Mismatch")
-)
+
