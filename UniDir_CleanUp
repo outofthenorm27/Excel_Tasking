@@ -88,21 +88,11 @@ To include more name format variations in your validation logic — now allowing
 
 
 
-=LET(
-    fullName, A2,
-    first, LOWER(TRIM(RIGHT(fullName, LEN(fullName)-FIND(",", fullName)))),
-    last, LOWER(LEFT(fullName, FIND(",", fullName)-1)),
-    email, LOWER(B2),
-    fmt1, first & "." & last,
-    fmt2, first & "_" & last,
-    fmt3, last & "." & first,
-    fmt4, last & "_" & first,
-    fmt5, LEFT(first,1) & last,
-    IF(OR(
-        ISNUMBER(SEARCH(fmt1, email)),
-        ISNUMBER(SEARCH(fmt2, email)),
-        ISNUMBER(SEARCH(fmt3, email)),
-        ISNUMBER(SEARCH(fmt4, email)),
-        ISNUMBER(SEARCH(fmt5, email))
-    ), "", "Name Mismatch")
-)
+=IF(OR(
+  ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))) & "." & LOWER(LEFT(A2,FIND(",",A2)-1)), LOWER(B2))),
+  ISNUMBER(SEARCH(LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))) & "_" & LOWER(LEFT(A2,FIND(",",A2)-1)), LOWER(B2))),
+  ISNUMBER(SEARCH(LOWER(LEFT(A2,FIND(",",A2)-1)) & "." & LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))), LOWER(B2))),
+  ISNUMBER(SEARCH(LOWER(LEFT(A2,FIND(",",A2)-1)) & "_" & LOWER(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))), LOWER(B2))),
+  ISNUMBER(SEARCH(LOWER(LEFT(SUBSTITUTE(TRIM(RIGHT(A2,LEN(A2)-FIND(",",A2)))," ",""),1) & LOWER(LEFT(A2,FIND(",",A2)-1))), LOWER(B2)))
+), "", "Name Mismatch")
+
